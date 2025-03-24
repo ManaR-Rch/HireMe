@@ -2,6 +2,13 @@
 
 return [
 
+    'providers' => [
+    // ...
+    App\Providers\RouteServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+
+    // ...
+],
     /*
     |--------------------------------------------------------------------------
     | Application Name

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -7,48 +6,29 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CandidatureStatusChanged extends Notification
+class CandidatureStatusChanged extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
+    protected $candidature;
+
+    public function __construct($candidature)
     {
-        //
+        $this->candidature = $candidature;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
+    public function via($notifiable)
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
+            ->subject('Statut de votre candidature mis à jour')
+            ->line('Le statut de votre candidature pour l\'annonce "'.$this->candidature->annonce->title.'" a été mis à jour.')
+            ->line('Nouveau statut: '.$this->candidature->status)
+            ->action('Voir la candidature', url('/candidatures/'.$this->candidature->id))
+            ->line('Merci d\'utiliser notre plateforme!');
     }
 }
