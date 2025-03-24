@@ -2,65 +2,34 @@
 
 namespace App\Policies;
 
-use App\Models\Candidature;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\Candidature;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CandidaturePolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+
+    public function view(User $user, Candidature $candidature)
     {
-        return false;
+        return $user->id === $candidature->user_id 
+               || $user->id === $candidature->annonce->user_id
+               || $user->role === 'admin';
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Candidature $candidature): bool
+    public function create(User $user)
     {
-        return false;
+        return $user->role === 'candidate';
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function update(User $user, Candidature $candidature)
     {
-        return false;
+        return $user->id === $candidature->annonce->user_id;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Candidature $candidature): bool
+    public function delete(User $user, Candidature $candidature)
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Candidature $candidature): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Candidature $candidature): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Candidature $candidature): bool
-    {
-        return false;
+        return $user->id === $candidature->user_id
+               || $user->role === 'admin';
     }
 }
