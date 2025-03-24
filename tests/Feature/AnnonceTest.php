@@ -2,19 +2,28 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Annonce;
+use App\Models\User;
 use Tests\TestCase;
 
-class AnnonceTest extends TestCase
+class AnnoncePolicyTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_example(): void
+    public function test_recruiter_can_create_annonces()
     {
-        $response = $this->get('/');
+        $user = User::factory()->create(['role' => 'recruiter']);
+        $this->assertTrue($user->can('create', Annonce::class));
+    }
 
-        $response->assertStatus(200);
+    public function test_candidate_cannot_create_annonces()
+    {
+        $user = User::factory()->create(['role' => 'candidate']);
+        $this->assertFalse($user->can('create', Annonce::class));
+    }
+
+    public function test_owner_can_update_annonce()
+    {
+        $user = User::factory()->create(['role' => 'recruiter']);
+        $annonce = Annonce::factory()->create(['user_id' => $user->id]);
+        $this->assertTrue($user->can('update', $annonce));
     }
 }
